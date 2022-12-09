@@ -23,6 +23,7 @@ jobs:
 
     - name: Install dependencies
       run: dotnet restore
+      working-directory: DigitalAsset
       
     - name: Build
       run: |
