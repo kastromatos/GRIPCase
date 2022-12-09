@@ -2,12 +2,18 @@ name: GRIP deploy
 
 on:
   workflow_dispatch:
-#    branches: [ production ]
-
+  
 env:
-  AZURE_WEBAPP_NAME: DAMS
-  AZURE_WEBAPP_PACKAGE_PATH: 'DigitalAsset'
-  DOTNET_VERSION: '6.0.401'
+  spn_client_id: 0e742c50-7833-42da-8580-d9509eb14bd2
+  tenant_id: 93f33571-550f-43cf-b09f-cd331338d086
+  subscription_id: 6bc2e318-d6fd-4cde-a71c-007eb05321c5
+  #AZURE_WEBAPP_NAME: DAMS
+  #AZURE_WEBAPP_PACKAGE_PATH: 'DigitalAsset'
+  #DOTNET_VERSION: '6.0.401'
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -15,21 +21,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Install dependencies
-      run: dotnet restore
-      working-directory: DigitalAsset
+    - uses: azure/login@v1
+      with:
+        client-id: ${{ env.spn_client_id }}
+        tenant-id: ${{ env.tenant_id }}
+        subscription-id: ${{ env.subscription_id }}
+
+    - run: az account show
+
+    #- uses: actions/checkout@v3
+    #- name: Setup .NET Core
+    #  uses: actions/setup-dotnet@v3
+    #  with:
+    #    dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    #- name: Install dependencies
+    #  run: dotnet restore
+    #  working-directory: DigitalAsset
       
-    - name: Build
-      run: |
-        dotnet build --configuration Release --no-restore
-        dotnet publish -c Release -o ../da-app -r linux-x64 --self-contained true /p:UseAppHost=true
-      working-directory: DigitalAsset
+    #- name: Build
+    #  run: |
+    #    dotnet build --configuration Release --no-restore
+    #    dotnet publish -c Release -o ../da-app -r linux-x64 --self-contained true /p:UseAppHost=true
+    #  working-directory: DigitalAsset
 
     #- name: Test
     #  run: |
