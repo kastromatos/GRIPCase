@@ -35,13 +35,16 @@ jobs:
     - run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
       name: Deploy rg
 
-    - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }}
+    - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
+
+    - uses: actions/checkout@v3
 
     - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }} --dryrun
       name: Deploy default app
+      working-directory: DigitalAsset
 
-    #- uses: actions/checkout@v3
+
     #- name: Setup .NET Core
     #  uses: actions/setup-dotnet@v3
     #  with:
