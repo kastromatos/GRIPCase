@@ -40,7 +40,7 @@ jobs:
 
     - uses: actions/checkout@v3
 
-    - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }} --dryrun
+    - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
       name: Deploy default app
       working-directory: DigitalAsset
 
