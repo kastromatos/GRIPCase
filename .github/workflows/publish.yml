@@ -7,6 +7,10 @@ env:
   spn_client_id: 0e742c50-7833-42da-8580-d9509eb14bd2
   tenant_id: 93f33571-550f-43cf-b09f-cd331338d086
   subscription_id: 6bc2e318-d6fd-4cde-a71c-007eb05321c5
+  rg_name: griprg
+  plan_name: gripplan
+  location: westeurope
+  web_app_name: Grip-webapp
   #AZURE_WEBAPP_NAME: DAMS
   #AZURE_WEBAPP_PACKAGE_PATH: 'DigitalAsset'
   #DOTNET_VERSION: '6.0.401'
@@ -28,7 +32,14 @@ jobs:
         tenant-id: ${{ env.tenant_id }}
         subscription-id: ${{ env.subscription_id }}
 
-    - run: az account show
+    - run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
+      name: Deploy rg
+
+    - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }}
+      name: Deploy plan
+
+    - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }} --dryrun
+      name: Deploy default app
 
     #- uses: actions/checkout@v3
     #- name: Setup .NET Core
