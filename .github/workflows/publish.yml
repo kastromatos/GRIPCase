@@ -85,17 +85,3 @@ jobs:
       with: 
         app-name: ${{ env.web_app_name }}
         package: website
-
-    #- name: Update config
-    #  uses: Azure/appservice-settings@v1
-    #  with:
-    #   app-name: ${{ env.web_app_name }}
-    #   slot-name: staging
-    #   app-settings-json: |
-    #     [
-    #         {
-    #             "name": "UI:Index:Header",
-    #             "value": "${{ secrets.INDEX_HEADER }}",
-    #             "slotSetting": true
-    #         }
-    #     ]
