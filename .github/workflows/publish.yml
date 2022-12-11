@@ -86,7 +86,7 @@ jobs:
     #  name: Deploy default web app
     #  working-directory: DigitalAsset
 
-    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src DigitalAsset/website/website.zip
+    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src DigitalAsset/website.zip
       name: Deploy web app
 
 
