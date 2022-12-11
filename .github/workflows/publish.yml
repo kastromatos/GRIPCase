@@ -12,9 +12,7 @@ env:
   plan_name: gripplan
   location: westeurope
   web_app_name: Grip-webapp
-  #AZURE_WEBAPP_NAME: DAMS
-  #AZURE_WEBAPP_PACKAGE_PATH: 'DigitalAsset'
-  #DOTNET_VERSION: '6.0.401'
+
 
 permissions:
   id-token: write
@@ -22,7 +20,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,9 +39,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    #- name: Test
-    #  run: dotnet test --no-build --verbosity normal
-
     - name: Publish
       run: dotnet publish DigitalAsset.csproj -c Release -o website
 
@@ -54,7 +48,6 @@ jobs:
         name: website
         path: DigitalAsset/website/**
         if-no-files-found: error
-
 
   deploy:
     needs: build
@@ -81,20 +74,17 @@ jobs:
 
     - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
-
+    
+    # not sure about it...
     #- run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
     #  name: Deploy default web app
     #  working-directory: DigitalAsset
 
-    - name: 'Run Azure webapp deploy'
+    - name: Azure webapp deploy
       uses: azure/webapps-deploy@v2
       with: 
         app-name: ${{ env.web_app_name }}
         package: website
-
-    #- run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src website/website.zip
-    #  name: Deploy web app
-
 
     #- name: Update config
     #  uses: Azure/appservice-settings@v1
