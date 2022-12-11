@@ -51,7 +51,7 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: website
+        name: website.zip
         path: DigitalAsset/website/**
         if-no-files-found: error
 
