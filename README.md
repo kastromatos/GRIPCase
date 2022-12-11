@@ -41,3 +41,4 @@ Any of below bullets can be discussed separately.
 - No manual changes allowed on production environment (only dedicated SPN can manage resources)
 - Scaling rules
 - Documentation as a code
+- All secrets managed via KeyVault/github secrets
