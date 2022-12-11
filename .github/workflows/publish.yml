@@ -62,29 +62,35 @@ jobs:
         name: website
         path: website
 
-    - uses: azure/login@v1
-      name: Login to Azure using OIDC
+    - name: Login to Azure using OIDC
+      uses: azure/login@v1
       with:
         client-id: ${{ env.spn_client_id }}
         tenant-id: ${{ env.tenant_id }}
         subscription-id: ${{ env.subscription_id }}
 
     #- run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
-    - run: | 
+    - name: Deploy rg via ARM
+      run: | 
         az deployment sub create -l ${{ env.location }} --template-file templates/rg.json \
           --parameters rgLocation=${{ env.location }} rgName=${{ env.rg_name }}
-      name: Deploy rg via ARM
 
-    - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
-      name: Deploy plan
+
+    - name: Deploy plan
+      run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
+
     
-    # not sure about it...
     #- run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
     #  name: Deploy default web app
     #  working-directory: DigitalAsset
 
-    - name: Azure webapp deploy
+    - name: Azure webapp update
       uses: azure/webapps-deploy@v2
       with: 
         app-name: ${{ env.web_app_name }}
         package: website
+
+    - name: Set up application insight
+      run: |
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az monitor app-insights component create -a ${{ env.web_app_name }} -l ${{ env.location }} -g ${{ env.rg_name }} --retention-time 30
