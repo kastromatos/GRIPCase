@@ -1,6 +1,7 @@
 name: GRIP deploy
 
 on:
+  workflow_dispatch:
   push:
   
 env:
