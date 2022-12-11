@@ -20,17 +20,58 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  build:
 
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: DigitalAsset
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    #- name: Test
+    #  run: dotnet test --no-build --verbosity normal
+
+    - name: Publish
+      run: dotnet publish DigitalAsset.csproj -c Release -o website
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: website
+        path: website/**
+        if-no-files-found: error
+
+
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: website
+        path: website
 
     - uses: azure/login@v1
+      name: Login to Azure using OIDC
       with:
         client-id: ${{ env.spn_client_id }}
         tenant-id: ${{ env.tenant_id }}
-        subscription-id: ${{ env.subscription_id }}
+        subscription-id: ${{ env.subscription_id }}}}
 
     - run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
       name: Deploy rg
@@ -38,45 +79,23 @@ jobs:
     - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
 
-    - uses: actions/checkout@v3
-
-    #- run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
-    #  name: Deploy default app
-    #  working-directory: DigitalAsset
-
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
+    - name: Deploy web app
+      uses: azure/webapps-deploy@v2
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        app-name: ${{ env.web_app_name }}
+        slot-name: staging
+        package: website
 
-    - name: Install dependencies
-      run: dotnet restore
-      working-directory: DigitalAsset
-      
-    - name: Build
-      run: |
-        dotnet build --configuration Release --no-restore
-        dotnet publish -c Release -o ../da-app -r linux-x64 --self-contained true /p:UseAppHost=true
-        Compress-Archive da-app/* grip.zip
-      working-directory: DigitalAsset
-
-    - run: az webapp deployment source config-zip --src grip.zip
-      name: actual deploy
-      working-directory: DigitalAsset
-
-    #- run: az webapp deploy -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src-path SourcePath --type zip
-    #  name: deploy as zip
-    #  working-directory: DigitalAsset/da-app
-
-    #- name: Test
-    #  run: |
-    #    cd DotNet.WebApp.Tests
-    #    dotnet test --no-restore --verbosity normal
-      
-    #- uses: azure/webapps-deploy@v2
-    #  name: Deploy
+    #- name: Update config
+    #  uses: Azure/appservice-settings@v1
     #  with:
-    #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
-    #    publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-    #    package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dotnet-webapp'
+    #   app-name: ${{ env.web_app_name }}
+    #   slot-name: staging
+    #   app-settings-json: |
+    #     [
+    #         {
+    #             "name": "UI:Index:Header",
+    #             "value": "${{ secrets.INDEX_HEADER }}",
+    #             "slotSetting": true
+    #         }
+    #     ]
