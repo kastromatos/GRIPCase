@@ -69,8 +69,9 @@ jobs:
         tenant-id: ${{ env.tenant_id }}
         subscription-id: ${{ env.subscription_id }}
 
-    - run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
-      name: Deploy rg
+    #- run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
+    - run: az deployment sub create -l ${{ env.location }} --template-file templates/rg.json --parameters '{ \"rgLocation\":\"${{ env.location }}\",\"rgName\:\"${{ env.rg_name }}\" }'
+      name: Deploy rg via ARM
 
     - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
