@@ -80,7 +80,11 @@ jobs:
     - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
 
-    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.plan_name }} --src website.zip
+    - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
+      name: Deploy default web app
+      working-directory: DigitalAsset
+
+    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src website.zip
       name: Deploy web app
 
 
