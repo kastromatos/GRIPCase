@@ -51,7 +51,7 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: website.zip
+        name: website
         path: DigitalAsset/website/**
         if-no-files-found: error
 
@@ -66,7 +66,7 @@ jobs:
     - name: Download a Build Artifact
       uses: actions/download-artifact@v3
       with:
-        name: website.zip
+        name: website
         path: website
 
     - uses: azure/login@v1
@@ -86,12 +86,14 @@ jobs:
     #  name: Deploy default web app
     #  working-directory: DigitalAsset
 
-    - run: |
-        echo $PWD
-        echo */*/
+    - name: 'Run Azure webapp deploy'
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: ${{ env.web_app_name }}
+        package: website
 
-    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src website/website.zip
-      name: Deploy web app
+    #- run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --src website/website.zip
+    #  name: Deploy web app
 
 
     #- name: Update config
