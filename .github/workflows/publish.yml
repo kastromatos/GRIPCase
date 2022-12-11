@@ -71,7 +71,7 @@ jobs:
       with:
         client-id: ${{ env.spn_client_id }}
         tenant-id: ${{ env.tenant_id }}
-        subscription-id: ${{ env.subscription_id }}}}
+        subscription-id: ${{ env.subscription_id }}
 
     - run: az group create -l ${{ env.location }} -n ${{ env.rg_name }}
       name: Deploy rg
@@ -79,12 +79,9 @@ jobs:
     - run: az appservice plan create -g ${{ env.rg_name }} -n ${{ env.plan_name }} --sku F1
       name: Deploy plan
 
-    - name: Deploy web app
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.web_app_name }}
-        slot-name: staging
-        package: website
+    - run: az webapp deployment source config-zip -g ${{ env.rg_name }} -n ${{ env.plan_name }} --src website.zip
+      name: Deploy web app
+
 
     #- name: Update config
     #  uses: Azure/appservice-settings@v1
