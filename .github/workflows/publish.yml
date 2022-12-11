@@ -93,4 +93,5 @@ jobs:
     - name: Set up application insight
       run: |
         az config set extension.use_dynamic_install=yes_without_prompt
-        az monitor app-insights component create -a ${{ env.web_app_name }} -l ${{ env.location }} -g ${{ env.rg_name }} --retention-time 30
+        az monitor app-insights component create -a Grip-insight -l ${{ env.location }} -g ${{ env.rg_name }} --retention-time 30
+        az monitor app-insights component connect-webapp -g ${{ env.rg_name }} -a Grip-insight --web-app ${{ env.web_app_name }} --enable-profiler --enable-snapshot-debugger
