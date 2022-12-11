@@ -76,9 +76,9 @@ jobs:
       name: Deploy plan
     
     # not sure about it...
-    - run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
-      name: Deploy default web app
-      working-directory: DigitalAsset
+    #- run: az webapp up --sku F1 -p ${{ env.plan_name }} -n ${{ env.web_app_name }} --os-type windows -g ${{ env.rg_name }} -l ${{ env.location }}
+    #  name: Deploy default web app
+    #  working-directory: DigitalAsset
 
     - name: Azure webapp deploy
       uses: azure/webapps-deploy@v2
