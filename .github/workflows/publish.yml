@@ -12,6 +12,7 @@ env:
   plan_name: gripplan
   location: westeurope
   web_app_name: Grip-webapp
+  insights_name: Grip-insight
 
 
 permissions:
@@ -93,7 +94,7 @@ jobs:
     - name: Set up application insight
       run: |
         az config set extension.use_dynamic_install=yes_without_prompt
-        az monitor app-insights component create -a Grip-insight -l ${{ env.location }} -g ${{ env.rg_name }} --retention-time 30
-        az monitor app-insights component connect-webapp -g ${{ env.rg_name }} -a Grip-insight --web-app ${{ env.web_app_name }} --enable-profiler --enable-snapshot-debugger
-        APPINSIGHTS_CONNECTIONSTRING=$(az resource show --name Grip-insight -g ${{ env.rg_name }} --resource-type "microsoft.insights/components" --query properties.ConnectionString -o tsv) 
-        az webapp config appsettings set -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --settings APPLICATIONINSIGHTS_CONNECTION_STRING=$APPINSIGHTS_CONNECTIONSTRING
+        az monitor app-insights component create -a ${{ env.insights_name }} -l ${{ env.location }} -g ${{ env.rg_name }} --retention-time 30
+        az monitor app-insights component connect-webapp -g ${{ env.rg_name }} -a ${{ env.insights_name }} --web-app ${{ env.web_app_name }} --enable-profiler --enable-snapshot-debugger
+        #APPINSIGHTS_CONNECTIONSTRING=$(az resource show --name ${{ env.insights_name }} -g ${{ env.rg_name }} --resource-type "microsoft.insights/components" --query properties.ConnectionString -o tsv) 
+        #az webapp config appsettings set -g ${{ env.rg_name }} -n ${{ env.web_app_name }} --settings APPLICATIONINSIGHTS_CONNECTION_STRING=$APPINSIGHTS_CONNECTIONSTRING
